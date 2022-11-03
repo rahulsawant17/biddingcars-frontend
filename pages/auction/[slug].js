@@ -17,7 +17,7 @@ import AuctionHistory from '../../components/AuctionHistory';
 import moment from 'moment/moment';
 import { io } from "socket.io-client";
 
-const socket = io(`http://localhost:4000`);
+const socket = io(`https://bidbackend.netlify.app/.netlify/functions/socketIO`);
 // const socket = io(`http://localhost:4000/.netlify/functions/socketIO`);
 
 const AuctionDetail = () => {
