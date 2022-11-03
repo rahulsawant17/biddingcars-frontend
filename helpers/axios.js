@@ -9,7 +9,7 @@ if (typeof window !== 'undefined') {
   token = window.localStorage.getItem('token');
 }
 
-console.log(token);
+
 
 // const auth = useSelector((state) => state.auth);
 

@@ -6,7 +6,6 @@ import { toast } from 'react-toastify';
 export const listCar = (form,token,userinfo) => async (dispatch) => {
     try {
       dispatch({ type: listConstants.POST_LIST_REQUEST });
-      console.log('form',form,userinfo)
       const res = await axios.post(`/cars/add`,form
       ,{ headers: { Authorization: "Bearer " + token ,user:JSON.stringify(userinfo)}});
       if (res.status === 200) {

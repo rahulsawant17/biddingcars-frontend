@@ -9,6 +9,7 @@ const initState = {
   message:null,
   accessToken:null,
   role:null,
+  isVerified:false,
 };
 
 // eslint-disable-next-line import/no-anonymous-default-export
@@ -30,6 +31,7 @@ export default (state = initState, action) => {
         authenticate: true,
         accessToken:action.accessToken,
         role:action.role,
+        isVerified:action.isVerified,
       };
 
       break;

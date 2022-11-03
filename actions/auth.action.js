@@ -1,11 +1,10 @@
-import { authConstants, userinfoConstants } from "./constants";
+import { authConstants, userinfoConstants ,timelineConstants} from "./constants";
 import firebase from "firebase/compat/app";
 import "firebase/compat/auth";
 import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import { toast } from "react-toastify";
 import axios from "../helpers/axios";
 import { getUserinfo } from "./userinfo.action";
-// console.log(firebase);
 // Your app's Firebase configuration
 var firebaseConfig = {
   apiKey: process.env.apiKey,
@@ -20,7 +19,6 @@ var firebaseConfig = {
 if (!firebase.apps.length) {
   firebase.initializeApp(firebaseConfig);
 }
-console.log(firebase.auth);
 
 export default firebase;
 
@@ -32,7 +30,7 @@ export const checkSignin = () => async (dispatch) => {
 
         const res = await axios.get(`/users/${user.email}`, {
           headers: {
-            Authorization: "Bearer " + user.multiFactor?.user.accessToken,
+            Authorization: "Bearer " + user?.multiFactor?.user.accessToken,
           },
         });
         role = res.data?.role ? res.data.role : "user";
@@ -43,7 +41,6 @@ export const checkSignin = () => async (dispatch) => {
           accessToken: user.multiFactor?.user.accessToken,
           role: role,
         });
-        console.log(window.localStorage)
         if(!window.localStorage.getItem('token'))
         window.localStorage.setItem('token', user.multiFactor?.user.accessToken);
         // dispatch(getUserinfo(user.email));
@@ -88,12 +85,11 @@ export const signup =
               },
               {
                 headers: {
-                  Authorization: "Bearer " + user.multiFactor?.user.accessToken,
+                  Authorization: "Bearer " + user?.multiFactor?.user.accessToken,
                 },
               }
             );
             // if (user.emailVerified) {
-            // console.log(user)
             // Emailconsole is verified
             dispatch({
               type: authConstants.SIGNUP_SUCCESS,
@@ -112,7 +108,6 @@ export const signup =
           });
         })
         .catch(function (error) {
-          // console.log(error);
           dispatch({
             type: authConstants.SIGNUP_ERROR,
             payload:
@@ -120,7 +115,6 @@ export const signup =
           });
         });
     } catch (err) {
-      // console.log(err);
       dispatch({
         type: authConstants.SIGNUP_ERROR,
         payload:
@@ -176,6 +170,7 @@ export const signout = () => async (dispatch) => {
         dispatch({ type: authConstants.SIGNOUT_SUCCESS });
         window.localStorage.clear();
         dispatch({ type: userinfoConstants.USERINFO_NULL });
+        dispatch({ type: timelineConstants.TIMELINE_NULL });
       })
       .catch(() => {
         dispatch({
@@ -220,7 +215,6 @@ export const googleSignIn = () => async (dispatch) => {
               email: user.email,
               role: "user",
             };
-            console.log("reached hereeeeeeeeee", data);
             await axios
               .post(`users/add/`, data, {
                 headers: { Authorization: "Bearer " + idToken },
@@ -231,13 +225,12 @@ export const googleSignIn = () => async (dispatch) => {
                   payload: err.message,
                 });
               });
-            console.log("======user", user);
+
             // dispatch(getUserinfo(user.email));
             dispatch(getUserinfo(user.email, idToken));
           });
       })
       .catch((error) => {
-        console.log(error);
         const errorMessage = error.message;
         dispatch({
           type: authConstants.SIGNIN_ERROR,
@@ -288,7 +281,7 @@ export const updateEmail =
       firebase.auth().onAuthStateChanged(async (user) => {
         let res = await axios.get(`/users/${newemail}`, {
           headers: {
-            Authorization: "Bearer " + user.multiFactor?.user.accessToken,
+            Authorization: "Bearer " + user?.multiFactor?.user.accessToken,
             user: JSON.stringify(userinfo),
           },
         });
@@ -298,12 +291,10 @@ export const updateEmail =
             currentemail,
             currentpassword
           );
-          console.log(cred)
           let use = await user.reauthenticateWithCredential(cred).then(use=>{
             firebase.auth().onAuthStateChanged(async (user) => {
               try {
                 user.updateEmail(newemail);
-                console.log(user);
                 dispatch({
                   type: authConstants.UPDATE_EMAIL_SUCCESS,
                   payload: "Email Updated",

@@ -21,14 +21,14 @@ export default function Home() {
     dispatch(checkSignin());
     setTimeout(()=>router.push('/auctions'),0);
   }, [])
-  
+
 
   return (
     <div>
       Welcome to Bidding Cars<br />
       Redirecting to live auctions...<br/>
       <CircularProgress/>
-    
+
     </div>
   );
 }

@@ -91,12 +91,22 @@ const Signin = ({ createAccount }) => {
             <Button
               type="submit"
               onClick={() => {
-                setEmail("dummy@gmail.com");
-                setPassword("dummy123");
+                setEmail("dummyuser@gmail.com");
+                setPassword("9999999999");
               }}
               variant="outlined"
             >
-              Sign In Using Dummy Account
+              Sign In as a Dummy User
+            </Button>
+            <Button
+              type="submit"
+              onClick={() => {
+                setEmail("dummyadmin@gmail.com");
+                setPassword("9999999999");
+              }}
+              variant="outlined"
+            >
+              Sign In as a Dummy Admin
             </Button>
             <Button onClick={() => googleSign()} variant="outlined">
               Sign In With Google

@@ -1,7 +1,6 @@
 import firebase from 'firebase/compat/app'
 import "firebase/compat/auth";
 
-console.log(firebase.auth)
 // Your app's Firebase configuration
 var firebaseConfig = {
   apiKey: "AIzaSyDQEo0aBj6UC-FMeV2FbUkDO71Gg4ljQj4",

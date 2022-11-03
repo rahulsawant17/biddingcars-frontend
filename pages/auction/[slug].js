@@ -11,11 +11,24 @@ import BidDialog from '../../components/BidDialog';
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
 import { Radio, RadioGroup, FormControlLabel, FormControl, FormLabel } from '@mui/material';
 import { toast } from 'react-toastify';
-import { postBid } from '../../actions/bidding.action';
+import { postBid,postBidCheck } from '../../actions/bidding.action';
 import { checkSignin } from '../../actions/auth.action';
 import AuctionHistory from '../../components/AuctionHistory';
+import moment from 'moment/moment';
+import { io } from "socket.io-client";
+
+const socket = io(`http://localhost:4000`);
+// const socket = io(`http://localhost:4000/.netlify/functions/socketIO`);
 
 const AuctionDetail = () => {
+
+  useEffect(() => {
+    socket.on("bid_update", (data) => {
+      console.log(data);
+      setCar(data);
+    });
+  }, [socket]);
+
   const router = useRouter();
   const dispatch = useDispatch();
   const {
@@ -43,70 +56,37 @@ const AuctionDetail = () => {
   const [open, setOpen] = React.useState(false);
   const [step, setStep] = useState(1);
   const [newbid, setNewbid] = useState();
-  const [state, setState] = React.useState({
-    cardnumber: '',
-    name: '',
-    expiry: '',
-    cvv: '',
-    cardtype: '',
-    focused: '',
-  });
 
-  const handleClickOpen = () => {
-    auth.authenticate ? setOpen(true) : document.getElementById('signin-btn').click();
+  const handleClickOpen = async () => {
+    if(!auth.authenticate){
+      document.getElementById('signin-btn').click();
+    }else{
+      const resdata= await dispatch(postBidCheck( {
+        car,
+        email: auth.userId,
+        role: auth.role,
+      },
+      auth.accessToken))
+      console.log(resdata)
+      resdata?.check? resdata.isVerified?setOpen(true):toast('submit your address and card details for verification',{type:'warning'}):toast(resdata?.message,{ type: 'warning' })
+    }
   };
   const handleClose = () => {
     setOpen(false);
+  };
+  const placebid=()=>{
     dispatch(
       postBid(
         {
           car,
           email: auth.userId,
+          role: auth.role,
           bid: newbid,
         },
         auth.accessToken,
       ),
     );
-  };
-  const clearNumber = (value = '') => {
-    return value.replace(/\D+/g, '');
-  };
-  const formatCreditCardNumber = (value) => {
-    return value.slice(0, 12);
-  };
-  const formatCVV = (value, prevValue, allValues = {}) => {
-    const clearValue = clearNumber(value);
-    let maxLength = 4;
-
-    if (allValues.number) {
-      const issuer = Payment.fns.cardType(allValues.number);
-      maxLength = issuer === 'amex' ? 4 : 3;
-    }
-
-    return clearValue.slice(0, maxLength);
-  };
-
-  const formatExpirationDate = (value) => {
-    const clearValue = clearNumber(value);
-
-    if (clearValue.length >= 3) {
-      return `${clearValue.slice(0, 2)}/${clearValue.slice(2, 4)}`;
-    }
-
-    return clearValue;
-  };
-  const handleInputChange = ({ target }) => {
-    if (target.name === 'cardnumber') {
-      target.value = formatCreditCardNumber(target.value);
-    } else if (target.name === 'expiry') {
-      target.value = formatExpirationDate(target.value);
-    } else if (target.name === 'cvv') {
-      target.value = formatCVV(target.value);
-    } else if (target.name === 'cardtype') {
-      target.value = target.value;
-    }
-    setState({ ...state, [target.name]: target.value });
-  };
+  }
 
   const carSnippets = {
     width: {
@@ -145,95 +125,7 @@ const AuctionDetail = () => {
     fontSize: '17px',
     mt: '10px',
   };
-  const carddetails = () => {
-    return (
-      <>
-        <DialogTitle>Card Details</DialogTitle>
-        <DialogContent>
-          <DialogContentText>Enter your card details to continue your bid</DialogContentText>
-          <br />
-          <br />
-          <FormControl>
-            <FormLabel id="">Card Type</FormLabel>
-            <RadioGroup row name="row-card-group">
-              <FormControlLabel
-                value="debitCard"
-                name="cardtype"
-                control={<Radio />}
-                label="Debit Card"
-                onChange={handleInputChange}
-              />
-              <FormControlLabel
-                name="cardtype"
-                value="creditCard"
-                control={<Radio />}
-                label="Credit Card"
-                onChange={handleInputChange}
-              />
-            </RadioGroup>
-          </FormControl>
-          <TextField
-            autoFocus
-            margin="dense"
-            id="outlined-basic"
-            name="name"
-            label="Name on Card"
-            type="text"
-            fullWidth
-            variant="standard"
-            onChange={handleInputChange}
-          />
-          <TextField
-            // autoFocus
-            id="outlined-basic"
-            label="Card Number"
-            name="cardnumber"
-            pattern="[\d| ]{16,22}"
-            variant="standard"
-            // margin="dense"
-            type="number"
-            fullWidth
-            onChange={handleInputChange}
-          />
-          <div>
-            <TextField
-              sx={{ width: '20%', mt: '10px', mr: '20px' }}
-              id="outlined-basic"
-              label="Expiry Date"
-              name="expiry"
-              pattern="\d\d/\d\d"
-              variant="standard"
-              onChange={handleInputChange}
-              // type="number"
-              // value={modelYear}
-              // onChange={(e) => setModelYear(e.target.value)}
-            />
-            <TextField
-              sx={{ width: '20%', mt: '10px', mr: '20px' }}
-              id="outlined-basic"
-              label="CVV"
-              name="cvv"
-              variant="standard"
-              type="password"
-              onChange={handleInputChange}
-              // value={modelYear}
-              // onChange={(e) => setModelYear(e.target.value)}
-            />
-          </div>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose}>Cancel</Button>
-          <Button
-            onClick={() => {
-              setStep(2);
-            }}
-          >
-            Next
-          </Button>
-        </DialogActions>
-      </>
-    );
-  };
+
   const bid = () => {
     return (
       <>
@@ -260,15 +152,8 @@ const AuctionDetail = () => {
         <DialogActions>
           <Button
             onClick={() => {
-              setStep(1);
-            }}
-          >
-            Back
-          </Button>
-          <Button
-            onClick={() => {
               if (Number(newbid) > car?.currentBid) {
-                setStep(3);
+                setStep(2);
               } else {
                 toast('Bid amount should be greater than the current bid', { type: 'warning' });
               }
@@ -296,14 +181,14 @@ const AuctionDetail = () => {
         <DialogActions>
           <Button
             onClick={() => {
-              setStep(2);
+              setStep(1);
             }}
           >
             Back
           </Button>
           <Button
             onClick={() => {
-              handleClose();
+              placebid();
             }}
           >
             Submit
@@ -315,10 +200,8 @@ const AuctionDetail = () => {
   const page = () => {
     switch (step) {
       case 1:
-        return carddetails();
-      case 2:
         return bid();
-      case 3:
+      case 2:
         return confirmbid();
     }
   };
@@ -377,7 +260,7 @@ const AuctionDetail = () => {
           <Paper variant="outlined" sx={carSnippets}>
             <Paper variant="outlined" sx={innerSnippet}>
               <Box sx={innerSnippetUpper}>Time left</Box>
-              <Box sx={{ padding: '5px', textAlign: 'right' }}>08:24:50:90</Box>
+              <Box sx={{ padding: '5px', textAlign: 'right' }}>{moment(car?.endTime).fromNow()}</Box>
             </Paper>
           </Paper>
           <Paper variant="outlined" sx={carSnippets}>
@@ -399,7 +282,7 @@ const AuctionDetail = () => {
             >
               Place Bid
             </Button>
-            
+
           </Paper>
           <Dialog open={open} onClose={handleClose}>
             {page()}

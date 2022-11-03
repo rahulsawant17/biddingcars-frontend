@@ -44,11 +44,14 @@ export default function Settings() {
   };
 
   const changePassword = (currentpassword, password, confirmpassword) => {
-    console.log(currentpassword, password, confirmpassword);
-    if (password == confirmpassword) {
+
+    if(currentpassword == password){
+      toast("Password cannot be same as the last password", { type: "warning" });
+    }else if (password == confirmpassword) {
       dispatch(updatePassword({ currentpassword, password }));
-    } else {
-      alert("passwords do not match");
+    }
+    else {
+      toast("passwords do not match", { type: "warning" });
     }
   };
   const updateEmailTemp = () => {
@@ -191,7 +194,7 @@ export default function Settings() {
           {pages.map((page) => (
             <ListItem key={page.name} disablePadding>
               <ListItemButton sx={{ textAlign: "center" }} onClick={()=>{setPage(page.link)
-              console.log(step)}}>
+              }}>
                 <ListItemText primary={page.name} />
               </ListItemButton>
             </ListItem>

@@ -42,6 +42,10 @@ export default function List() {
       setStep(1);
     }
   }, [auth.authenticate]);
+
+  const date = new Date();
+  date.setDate(date.getDate() + 7);
+
   const submitForm = () => {
     const form = new FormData();
     form.append('carCompany', carCompany);
@@ -53,7 +57,7 @@ export default function List() {
     form.append('condition', condition);
     form.append('basePrice', basePrice);
     form.append('fullPrice', fullPrice);
-
+    form.append('endTime', date);
     for (let pic of file) {
       form.append('image', pic);
     }
@@ -80,6 +84,14 @@ export default function List() {
       currency: 'INR',
     });
     return curr;
+  };
+
+  const nextStepHandler = (currArray,nextStep,name) => {
+    if (currArray.length) {
+      setStep(nextStep);
+    } else {
+      toast(`Please upload ${name} profile photographs of your car`, { type: 'warning' });
+    }
   };
 
   const renderStepOne = () => {
@@ -119,6 +131,7 @@ export default function List() {
                 id="outlined-basic"
                 label="Model Year"
                 variant="outlined"
+                type="number"
                 value={modelYear}
                 onChange={(e) => setModelYear(e.target.value)}
               />
@@ -127,6 +140,7 @@ export default function List() {
                 id="outlined-basic"
                 label="Kilometers Driven"
                 variant="outlined"
+                type="number"
                 value={kilometersDriven}
                 onChange={(e) => setKilometersDriven(e.target.value)}
               />
@@ -138,6 +152,7 @@ export default function List() {
                 id="outlined-basic"
                 label="Base Price"
                 variant="outlined"
+                type="number"
                 value={basePrice}
                 onChange={(e) => setBasePrice(e.target.value)}
               />
@@ -146,6 +161,7 @@ export default function List() {
                 id="outlined-basic"
                 label="Sticker Price"
                 variant="outlined"
+                type="number"
                 value={fullPrice}
                 onChange={(e) => setFullPrice(e.target.value)}
               />
@@ -176,7 +192,23 @@ export default function List() {
               variant="contained"
               color="secondary"
               sx={{ width: '50%', mx: 'auto', my: '15px' }}
-              onClick={() => setStep(2)}
+              onClick={(e) => {
+                if (
+                  carCompany &&
+                  modelName &&
+                  color &&
+                  modelYear &&
+                  kilometersDriven &&
+                  basePrice &&
+                  fullPrice &&
+                  description &&
+                  condition
+                ) {
+                  setStep(2);
+                } else {
+                  toast('Please fill all the fields!', { type: 'warning' });
+                }
+              }}
             >
               Next
             </Button>
@@ -249,7 +281,7 @@ export default function List() {
               <Button variant="outlined" color="secondary" onClick={() => setStep(1)} sx={nextButton}>
                 Back
               </Button>
-              <Button variant="contained" color="secondary" onClick={() => setStep(3)} sx={nextButton}>
+              <Button variant="contained" color="secondary" onClick={() => nextStepHandler(front,3,'Front')} sx={nextButton}>
                 Next
               </Button>
             </Box>
@@ -321,7 +353,7 @@ export default function List() {
               <Button variant="outlined" color="secondary" onClick={() => setStep(2)} sx={nextButton}>
                 Back
               </Button>
-              <Button variant="contained" color="secondary" onClick={() => setStep(4)} sx={nextButton}>
+              <Button variant="contained" color="secondary" onClick={() => nextStepHandler(back,4,'Rear')} sx={nextButton}>
                 Next
               </Button>
             </Box>
@@ -394,7 +426,7 @@ export default function List() {
               <Button variant="outlined" color="secondary" onClick={() => setStep(3)} sx={nextButton}>
                 Back
               </Button>
-              <Button variant="contained" color="secondary" onClick={() => setStep(5)} sx={nextButton}>
+              <Button variant="contained" color="secondary" onClick={() => nextStepHandler(right,5,'Right')} sx={nextButton}>
                 Next
               </Button>
             </Box>
@@ -467,7 +499,7 @@ export default function List() {
               <Button variant="outlined" color="secondary" onClick={() => setStep(4)} sx={nextButton}>
                 Back
               </Button>
-              <Button variant="contained" color="secondary" onClick={() => setStep(6)} sx={nextButton}>
+              <Button variant="contained" color="secondary" onClick={() => nextStepHandler(left,6,'Left')} sx={nextButton}>
                 Next
               </Button>
             </Box>
@@ -541,7 +573,7 @@ export default function List() {
               <Button variant="outlined" color="secondary" onClick={() => setStep(5)} sx={nextButton}>
                 Back
               </Button>
-              <Button variant="contained" color="secondary" onClick={() => setStep(7)} sx={nextButton}>
+              <Button variant="contained" color="secondary" onClick={() => nextStepHandler(interior,7,'Interior')} sx={nextButton}>
                 Next
               </Button>
             </Box>

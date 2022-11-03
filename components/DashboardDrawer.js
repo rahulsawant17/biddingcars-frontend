@@ -23,7 +23,7 @@ export default function DashboardDrawer(props) {
     auth.role === "admin"
       ? [
           { name: "Profile", link: "/profile", icon: AccountCircleIcon },
-          { name: "My Listings", link: "/mylistings", icon: ListIcon },
+          // { name: "My Listings", link: "/mylistings", icon: ListIcon },
           { name: "Settings", link: "/settings", icon: SettingsIcon },
           {
             name: "Verify Listings",

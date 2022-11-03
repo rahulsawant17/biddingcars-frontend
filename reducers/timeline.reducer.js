@@ -4,6 +4,8 @@ const initState = {
   waiting: false,
   timeline: [],
   currentHistory: [],
+  myListing: [],
+  myBid: [],
 };
 
 // eslint-disable-next-line import/no-anonymous-default-export
@@ -38,6 +40,26 @@ export default (state = initState, action) => {
       };
 
       break;
+    case timelineConstants.GET_MYLISTING_SUCCESS:
+      state = {
+        ...state,
+        myListing: action.payload,
+      };
+
+      break;
+      case timelineConstants.GET_MYBID_SUCCESS:
+        state = {
+          ...state,
+          myBid: action.payload,
+        };
+
+        break;
+      case timelineConstants.TIMELINE_NULL:
+        state = {
+          ...initState
+        };
+
+        break;
   }
   return state;
 };

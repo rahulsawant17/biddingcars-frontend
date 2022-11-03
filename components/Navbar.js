@@ -25,14 +25,9 @@ import { AiFillCar } from "react-icons/ai";
 import Logo from "./Logo";
 import Forgotpassword from "./Forgotpassword";
 const drawerWidth = 300;
-const navItems = [
-  { name: "Auctions", link: "/auctions" },
-  { name: "List a car", link: "/list" },
-  { name: "Dashboard", link: "/dashboard" },
-];
+
 function Navbar(props) {
   const router = useRouter();
-  // console.log(router.pathname);
   const auth = useSelector((state) => state.auth);
   const { window } = props;
   const [mobileOpen, setMobileOpen] = React.useState(false);
@@ -40,7 +35,16 @@ function Navbar(props) {
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
-
+  const navItems = auth.role === "admin"
+?[
+  { name: "Auctions", link: "/auctions" },
+  // { name: "List a car", link: "/list" },
+  { name: "Dashboard", link: "/dashboard" },
+]:[
+  { name: "Auctions", link: "/auctions" },
+  { name: "List a car", link: "/list" },
+  { name: "Dashboard", link: "/dashboard" },
+];
   const [state, setState] = React.useState({
     right: false,
   });

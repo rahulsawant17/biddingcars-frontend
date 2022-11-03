@@ -7,7 +7,7 @@ import DashboardDrawer from "../components/DashboardDrawer";
 import Reqsignin from "../components/Reqsignin";
 import Unauthorized from "../components/Unauthorized";
 import { Box, Card, CircularProgress, Paper, Typography } from "@mui/material";
-import { getTimeline } from "../actions/timeline.action";
+import { getTimeline,getMyListing } from "../actions/timeline.action";
 import Image from "next/image";
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -30,6 +30,7 @@ export default function Verifylistings() {
   useEffect(() => {
     dispatch(checkSignin());
     dispatch(getTimeline());
+    dispatch(getMyListing(auth.userId,auth.accessToken));
   }, []);
 
   return !auth.authenticate ? (
@@ -63,7 +64,7 @@ export default function Verifylistings() {
         {timeline.waiting ? (
           <CircularProgress />
         ) : (
-          timeline.timeline.map((car, index) => (
+          timeline.myListing.map((car, index) => (
             <Box
               key={index}
               sx={{
@@ -128,6 +129,7 @@ export default function Verifylistings() {
                     background: "primary",
                     pt: "20px",
                     px: "10px",
+                    pb:"20px",
                     borderRadius: "0px 10px 0px 0px",
                     color: "text.primary",
                   }}
@@ -161,24 +163,46 @@ export default function Verifylistings() {
                   >
                     <div>Current Bid Price: ₹{car.currentBid}</div>
 
-                    <div>🕧 10 days &nbsp;</div>
-                    <div>Total Bids: {89}</div>
+                    <div>🕧 {car.createdAt} &nbsp;</div>
+                    <div>Total Bids: {car.numberOfBids}</div>
                     <div>Base Price: ₹{car.basePrice}</div>
                   </Box>
                 </Box>
-                {reduce(car.condition)}
+                <Box
+                    sx={{
+                      width: "50vw",
+                      display: "inline-flex",
+                      flexDirection: {xs:'column',sm:'column',md:'row'},
+                      flexWrap:'wrap',
+                      justifyContent: "space-between",
+                      pt: "10px",
+                    pl: "10px",
+                    }}
+                  >
+                    <div>{reduce(car.condition)}</div>
+                  </Box>
+
               </Box>
               <Box
-                style={{
+                sx={{
                   height: {xs:"20px",md:"160px"},
                   margin: "5px",
-                  width: "80px",
+                  width: "100px",
                   display: "flex",
                   flexDirection: "column",
                   justifyContent: "space-evenly",
+                  px: "10px",
+                    pl: "10px",
                 }}
               >
-                <button>Verified</button>
+                <Box  sx={{
+
+                display: "flex",
+                borderRadius: "2px",
+                backgroundColor:"#90caf9",
+                color:'black',
+                alignItems: 'center',
+              }}>{car.status}</Box>
               </Box>
             </Box>
           ))

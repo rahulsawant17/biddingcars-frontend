@@ -27,7 +27,7 @@ export const getUserinfo = (email, token) => async (dispatch) => {
 
 export const postUserinfo = (form,token,userinfo) => async (dispatch) => {
   try {
-    console.log("updating", form);
+
     dispatch({ type: userinfoConstants.POST_USERINFO_REQUEST });
     const res = await axios.post(`/users/update`,form
     ,{ headers: { Authorization: "Bearer " + token ,user:JSON.stringify(userinfo)}}
@@ -45,5 +45,28 @@ export const postUserinfo = (form,token,userinfo) => async (dispatch) => {
   } catch (err) {
     dispatch({ type: userinfoConstants.POST_USERINFO_FAILURE });
     toast("Error Updating User", { type: "error" });
+  }
+};
+
+export const addCardInfo = (form,token,userinfo) => async (dispatch) => {
+  try {
+
+    dispatch({ type: userinfoConstants.POST_USERINFO_REQUEST });
+    const res = await axios.post(`/cards/add`,form
+    ,{ headers: { Authorization: "Bearer " + token ,user:JSON.stringify(userinfo)}}
+    );
+    if (res.status === 200) {
+      dispatch({
+        type: userinfoConstants.POST_USERINFO_SUCCESS,
+        payload: res.data,
+      });
+      toast("Card Added Successfully !", { type: "success" });
+    } else {
+      dispatch({ type: userinfoConstants.POST_USERINFO_FAILURE });
+      toast("Error Adding Card", { type: "error" });
+    }
+  } catch (err) {
+    dispatch({ type: userinfoConstants.POST_USERINFO_FAILURE });
+    toast("Error Adding Card", { type: "error" });
   }
 };
