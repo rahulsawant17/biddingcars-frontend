@@ -1,0 +1,1 @@
+/socket.io EIO=:EIO transport=:transport t=:t /.netlify/functions/socketIO/:EIO/:transport/:t
